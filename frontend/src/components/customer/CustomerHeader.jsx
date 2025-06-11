@@ -41,6 +41,9 @@ const isActive = (path) => {
   if (path === '/chome') {
     return location.pathname === '/chome' || location.pathname === '/ceditprofile';
   }
+  if (path === '/products') {
+    return location.pathname.startsWith('/products') || location.pathname.startsWith('/productdetails/')|| location.pathname.startsWith('/checkout/');
+  }
   return location.pathname === path;
 };
 

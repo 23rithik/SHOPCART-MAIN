@@ -1,0 +1,135 @@
+const express = require('express');
+const router = express.Router();
+const Razorpay = require('razorpay');
+const Order = require('../models/Order');
+const Product = require('../models/Product');
+const verifyToken = require('../middleware/auth');
+const sendEmail = require('../utils/sendEmail');  
+
+
+// Razorpay config
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+
+// GET /api/order-status/status - Get all orders for the logged-in customer
+router.get('/getstatus', verifyToken, async (req, res) => {
+  try {
+    const orders = await Order.find({ customerId: req.user.customerId })
+      .populate({
+        path: 'productId',
+        model: Product,
+        select: 'name price image quantity description category',
+      })
+      .sort({ createdAt: -1 }); // latest first
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/order-status/status/:id - Update shipping status (admin or internal use)
+router.put('/:id', verifyToken, async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const { shippingStatus } = req.body;
+
+    const validStatuses = [
+      'ordered',
+      'shipped',
+      'in transit',
+      'out for delivery',
+      'delivered',
+      'cancelled',
+    ];
+
+    if (!validStatuses.includes(shippingStatus)) {
+      return res.status(400).json({ message: 'Invalid shipping status' });
+    }
+
+    const order = await Order.findOne({ _id: orderId, customerId: req.user.id });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Prevent updates if already delivered or cancelled
+    if (['delivered', 'cancelled'].includes(order.shippingStatus)) {
+      return res.status(400).json({
+        message: 'Cannot update a delivered or cancelled order',
+      });
+    }
+
+    order.shippingStatus = shippingStatus;
+    await order.save();
+
+    res.json({ message: 'Shipping status updated successfully', order });
+  } catch (err) {
+    console.error('Error updating shipping status:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Cancel order
+router.put('/cancel/:id', verifyToken, async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const customerId = req.user.customerId;
+    const userEmail = req.user.email;
+
+    const order = await Order.findById(orderId).populate('productId');
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (order.customerId.toString() !== customerId)
+      return res.status(403).json({ message: 'Unauthorized' });
+
+    if (order.shippingStatus !== 'ordered')
+      return res.status(400).json({ message: 'Only orders in "ordered" status can be cancelled' });
+
+    // 💸 Refund (if payment captured and razorpayPaymentId exists)
+    if (order.paymentStatus === 'paid' && order.razorpayPaymentId) {
+      try { 
+        const refund = await razorpay.payments.refund(order.razorpayPaymentId);
+        console.log('✅ Refund successful:', refund.id);
+      } catch (refundErr) {
+        console.error('❌ Refund failed:', refundErr);
+        return res.status(500).json({ message: 'Refund failed' });
+      }
+    }
+
+    // ❌ Cancel the order
+    order.shippingStatus = 'cancelled';
+    await order.save();
+
+    // 📧 Send cancellation email
+    const emailText = `
+            Hi,
+
+            Your order for "${order.productId.name}" has been successfully cancelled.
+
+            Refund (if applicable) will be processed to your account shortly.
+
+            Order ID: ${order._id}
+            Cancelled On: ${new Date().toLocaleString()}
+
+            Thank you,
+            Shopcart Team
+                `;
+
+    await sendEmail(userEmail, 'Order Cancelled - PediatricPal', emailText);
+
+    res.json({ message: 'Order cancelled, refund processed, and email sent', order });
+  } catch (err) {
+    console.error('❌ Error in cancellation:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+module.exports = router;

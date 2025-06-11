@@ -45,4 +45,41 @@ router.post('/add', auth, async (req, res) => {
   }
 });
 
+router.get('/', auth, async (req, res) => {
+  try {
+    const customerId = req.user.customerId;
+
+    const cartItems = await Cart.find({ customerId })
+      .populate({
+        path: 'productId',
+        model: Product, // 👈 Ensures correct model reference
+        select: 'name price image quantity category description', // 👈 Optional: fetch only needed fields
+      });
+      console.log('Cart items:', cartItems);
+    res.json(cartItems);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// DELETE /api/cart/:id
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const cartItem = await Cart.findById(req.params.id);
+
+    if (!cartItem) return res.status(404).json({ message: 'Cart item not found' });
+    if (cartItem.customerId.toString() !== req.user.customerId) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    await cartItem.deleteOne();
+    res.json({ message: 'Item removed from cart' });
+  } catch (error) {
+    console.error('Delete cart item error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 module.exports = router;

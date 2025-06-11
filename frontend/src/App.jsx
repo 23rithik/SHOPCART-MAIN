@@ -24,6 +24,10 @@ import EditProfile from './components/shopkeeper/EditProfile';
 import ShopkeeperSendFeedback from './components/shopkeeper/ShopkeeperAdminFeedback';
 import CustomerEditProfile from './components/customer/CustomerEditProfile';
 import AllProducts from './components/customer/AllProducts';
+import ProductDetails from './components/customer/ProductDetails';
+import Checkout from './components/customer/Checkout';
+import CartPage from './components/customer/CartPage';
+import CustomerOrders from './components/customer/CustomerOrders';
 
 function App() {
   return (
@@ -50,6 +54,12 @@ function App() {
         <Route path="/chome" element={<PrivateRoute><CustomerHome /></PrivateRoute>} />
         <Route path="/ceditprofile" element={<PrivateRoute><CustomerEditProfile /></PrivateRoute>} />
         <Route path="/products" element={<PrivateRoute><AllProducts /></PrivateRoute>} />
+        <Route path="/productdetails/:id" element={<PrivateRoute><ProductDetails /></PrivateRoute>} />
+        <Route path="/checkout/:id" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+        <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+        <Route path="/orders" element={<PrivateRoute><CustomerOrders /></PrivateRoute>} />
+        
+        {/* Shopkeeper routes */}
         
         <Route path="/shome" element={<PrivateRoute><ShopkeeperHome /></PrivateRoute>} />
         <Route path="/smproducts" element={<PrivateRoute><ManageProducts /></PrivateRoute>} />
