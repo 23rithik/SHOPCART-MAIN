@@ -55,6 +55,7 @@ const CustomerHome = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const navigate = useNavigate();
+  const [customerName, setCustomerName] = useState('');
 
   const capitalizeFirstLetter = (string) => {
     if (!string) return '';
@@ -81,6 +82,7 @@ const CustomerHome = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfilePic(res.data.profilePic);
+        setCustomerName(res.data.name);
       } catch (error) {
         console.error('Failed to fetch profile picture:', error);
       }
@@ -161,7 +163,7 @@ const CustomerHome = () => {
           >
             <Toolbar sx={{ justifyContent: 'space-between' }}>
               <Typography variant="h6" fontWeight={600} color="green">
-                Welcome Customer!
+                Welcome, {customerName ? ` ${capitalizeFirstLetter(customerName)}` : ''}!
               </Typography>
               <IconButton onClick={() => navigate('/ceditprofile')}>
                 <Avatar
