@@ -28,6 +28,8 @@ import ProductDetails from './components/customer/ProductDetails';
 import Checkout from './components/customer/Checkout';
 import CartPage from './components/customer/CartPage';
 import CustomerOrders from './components/customer/CustomerOrders';
+import CustomerAdminFeedback from './components/customer/CustomerAdminFeedback';
+import CustomerShopkeeperFeedback from './components/customer/CustomerShopkeeperFeedback';
 
 function App() {
   return (
@@ -58,6 +60,8 @@ function App() {
         <Route path="/checkout/:id" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="/orders" element={<PrivateRoute><CustomerOrders /></PrivateRoute>} />
+        <Route path="/customeradminfeedback" element={<PrivateRoute><CustomerAdminFeedback /></PrivateRoute>} />
+        <Route path="/customershopkeeperfeedback" element={<PrivateRoute><CustomerShopkeeperFeedback /></PrivateRoute>} />
         
         {/* Shopkeeper routes */}
         

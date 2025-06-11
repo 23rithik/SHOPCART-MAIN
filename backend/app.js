@@ -31,6 +31,7 @@ const customerEditProfileRoutes = require('./routes/customerEditProfile'); // im
 const productdetailsRoutes = require('./routes/productdetails'); // import product details routes
 const orderRoutes = require('./routes/order'); // import order routes
 const ordersStatusRoutes = require('./routes/orderStatus'); // import order status routes
+const customeradminfeedback=require('./routes/CustomerAdminFeedback'); // import customer admin feedback routes
 
 // const shopkeeperActivity = require('./routes/shopkeeperActivity'); // import shopkeeper activity routes
 
@@ -64,6 +65,8 @@ app.use('/api/customer/profile/edit', customerEditProfileRoutes); // Use the cus
 app.use('/api/productdetails', productdetailsRoutes); // Use the product details routes
 app.use('/api/orders', orderRoutes); // Use the order routes
 app.use('/api/orderstatus/status', ordersStatusRoutes); // Use the order status routes
+app.use('/api/feedbacks', customeradminfeedback); // Use the customer admin feedback routes
+app.use('/api/customer-shopkeeper-feedback', require('./routes/customerToShopkeeperFeedback'));
 
 // app.use('/api', shopkeeperActivity);
 
