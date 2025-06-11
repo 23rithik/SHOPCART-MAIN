@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import CustomerHeader from './CustomerHeader';
 import CustomerFooter from './CustomerFooter';
@@ -25,6 +26,7 @@ const CartPage = () => {
   const [customerId, setCustomerId] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +50,8 @@ const CartPage = () => {
         setCartItems(res.data);
       } catch (err) {
         console.error('Error fetching cart items:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -91,11 +95,21 @@ const CartPage = () => {
 
       <Box sx={{ flex: 1 }}>
         <Container sx={{ pt: 14, pb: 8 }}>
-          <Typography variant="h4" fontWeight={600} mb={4} color="green" textAlign="center">
-            My Cart
-          </Typography>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <Typography variant="h4" fontWeight={600} mb={4} color="green" textAlign="center">
+              My Cart
+            </Typography>
+          </motion.div>
 
-          {cartItems.length === 0 ? (
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh">
+              <CircularProgress color="success" size={60} />
+            </Box>
+          ) : cartItems.length === 0 ? (
             <Typography textAlign="center">Your cart is empty.</Typography>
           ) : (
             <>
@@ -157,9 +171,15 @@ const CartPage = () => {
 
               <Divider sx={{ my: 3 }} />
 
-              <Typography variant="h6" fontWeight={600} textAlign="right">
-                Total Price: ₹{totalPrice}
-              </Typography>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Typography variant="h6" fontWeight={600} textAlign="right">
+                  Total Price: ₹{totalPrice}
+                </Typography>
+              </motion.div>
             </>
           )}
         </Container>
@@ -168,10 +188,7 @@ const CartPage = () => {
       <CustomerFooter />
 
       {/* Confirmation Dialog */}
-      <Dialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-      >
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Remove Product</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to remove this item from your cart?</Typography>

@@ -17,6 +17,7 @@ import axiosInstance from '../axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { motion } from 'framer-motion';
 
 const CustomerEditProfile = () => {
   const [formData, setFormData] = useState({
@@ -30,15 +31,12 @@ const CustomerEditProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [profilePicPreview, setProfilePicPreview] = useState(null);
   const [profilePicFile, setProfilePicFile] = useState(null);
   const [originalProfilePic, setOriginalProfilePic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [errors, setErrors] = useState({});
-
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -62,7 +60,7 @@ const CustomerEditProfile = () => {
           setOriginalProfilePic(customer.profilePic);
         }
       } catch (err) {
-        // Could add error snackbar here if needed
+        // Optional error handling
       } finally {
         setLoading(false);
       }
@@ -70,13 +68,11 @@ const CustomerEditProfile = () => {
     fetchData();
   }, []);
 
-  // Regex validators
   const validators = {
     name: /^[A-Za-z\s]{3,50}$/,
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     phno: /^\d{10,15}$/,
-    password:
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, // min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special
+    password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
   };
 
   const validateField = (name, value) => {
@@ -105,7 +101,6 @@ const CustomerEditProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -118,7 +113,6 @@ const CustomerEditProfile = () => {
       }));
     }
 
-    // validate current field on change
     const errorMsg = validateField(name, value);
     setErrors((prev) => ({
       ...prev,
@@ -147,7 +141,6 @@ const CustomerEditProfile = () => {
 
   const isFormValid = () => {
     const currentErrors = {};
-
     if (!formData.name || validateField('name', formData.name))
       currentErrors.name = validateField('name', formData.name);
     if (!formData.email || validateField('email', formData.email))
@@ -163,16 +156,12 @@ const CustomerEditProfile = () => {
     }
 
     setErrors(currentErrors);
-
     return Object.keys(currentErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!isFormValid()) {
-      return;
-    }
+    if (!isFormValid()) return;
 
     setSaving(true);
     try {
@@ -199,10 +188,9 @@ const CustomerEditProfile = () => {
         setOriginalProfilePic(profilePicFile.name);
       }
 
-      // Show simple snackbar success message
       setSnackbarOpen(true);
     } catch (error) {
-      // Optionally handle errors here
+      // Optional error handling
     } finally {
       setSaving(false);
     }
@@ -214,149 +202,100 @@ const CustomerEditProfile = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <CustomerHeader />
-      <Container component="main" maxWidth="sm" sx={{ flexGrow: 1, py: 14 }}>
-        <Typography variant="h4" component="h1" mb={3} align="center" color="green">
-          Edit Profile
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
-            <input
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="profilePic-upload"
-              type="file"
-              onChange={handleFileChange}
-            />
-            <label
-              htmlFor="profilePic-upload"
-              style={{ cursor: 'pointer', textAlign: 'center' }}
-            >
-              <Avatar
-                src={profilePicPreview || 'https://i.pravatar.cc/150?img=12'}
-                sx={{
-                  width: 120,
-                  height: 120,
-                  border: '2px solid green',
-                  mb: 1,
-                  ml: 3,
-                }}
+      <motion.div
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
+        <Container component="main" maxWidth="sm" sx={{ flexGrow: 1, py: 14 }}>
+          <Typography variant="h4" component="h1" mb={3} align="center" color="green">
+            Edit Profile
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="profilePic-upload"
+                type="file"
+                onChange={handleFileChange}
               />
-              <Typography variant="body2" color="textSecondary">
-                Click to change profile picture
-              </Typography>
-            </label>
-            {profilePicFile && (
-              <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
-                Selected: {profilePicFile.name}
-              </Typography>
-            )}
+              <label htmlFor="profilePic-upload" style={{ cursor: 'pointer', textAlign: 'center' }}>
+                <Avatar
+                  src={profilePicPreview || 'https://i.pravatar.cc/150?img=12'}
+                  sx={{ width: 120, height: 120, border: '2px solid green', mb: 1, ml: 3 }}
+                />
+                <Typography variant="body2" color="textSecondary">
+                  Click to change profile picture
+                </Typography>
+              </label>
+              {profilePicFile && (
+                <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
+                  Selected: {profilePicFile.name}
+                </Typography>
+              )}
+            </Box>
+
+            <TextField fullWidth margin="normal" required label="Name" name="name" value={formData.name}
+              onChange={handleChange} error={!!errors.name} helperText={errors.name || ''} />
+            <TextField fullWidth margin="normal" required label="Email" name="email" type="email"
+              value={formData.email} onChange={handleChange} error={!!errors.email} helperText={errors.email || ''} />
+            <TextField fullWidth margin="normal" label="Phone Number" name="phno"
+              value={formData.phno} onChange={handleChange} error={!!errors.phno} helperText={errors.phno || ''} />
+            <TextField fullWidth margin="normal" label="Address" name="address" multiline rows={3}
+              value={formData.address} onChange={handleChange} />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              label="New Password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              value={formData.password}
+              onChange={handleChange}
+              helperText={errors.password || 'Leave blank to keep your current password'}
+              error={!!errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              label="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword || ''}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end">
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              onCopy={(e) => e.preventDefault()}
+              onPaste={(e) => e.preventDefault()}
+            />
+
+            <Button type="submit" fullWidth variant="contained" color="success" disabled={saving} sx={{ mt: 3, mb: 2 }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
           </Box>
-
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            error={!!errors.name}
-            helperText={errors.name || ''}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={!!errors.email}
-            helperText={errors.email || ''}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Phone Number"
-            name="phno"
-            value={formData.phno}
-            onChange={handleChange}
-            error={!!errors.phno}
-            helperText={errors.phno || ''}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Address"
-            name="address"
-            multiline
-            rows={3}
-            value={formData.address}
-            onChange={handleChange}
-          />
-
-          <TextField
-            margin="normal"
-            fullWidth
-            label="New Password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={formData.password}
-            onChange={handleChange}
-            helperText={errors.password || 'Leave blank to keep your current password'}
-            error={!!errors.password}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Confirm Password"
-            type={showConfirmPassword ? 'text' : 'password'}
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword || ''}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    edge="end"
-                  >
-                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            onCopy={(e) => e.preventDefault()}
-            onPaste={(e) => e.preventDefault()}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="success"
-            disabled={saving}
-            sx={{ mt: 3, mb: 2 }}
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </Box>
-      </Container>
+        </Container>
+      </motion.div>
       <CustomerFooter />
 
-      {/* Simple Snackbar for success message */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

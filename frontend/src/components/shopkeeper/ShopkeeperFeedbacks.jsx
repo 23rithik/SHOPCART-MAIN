@@ -7,19 +7,19 @@ import {
   Paper,
   Snackbar,
   Alert,
+  Container,
 } from '@mui/material';
 import ShopkeeperHeader from './ShopkeeperHeader';
 import Footer from './ShopkeeperFooter';
 import axiosInstance from '../axiosInstance';
+import { motion } from 'framer-motion';
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [replyMap, setReplyMap] = useState({});
-  const [isEditing, setIsEditing] = useState({}); // Track which feedback is being edited
-
-  // Snackbar states
+  const [isEditing, setIsEditing] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
@@ -27,9 +27,7 @@ const Feedbacks = () => {
       try {
         const res = await axiosInstance.get('/api/shopkeeper-feedbacks/minee');
         setFeedbacks(res.data.feedbacks);
-        console.log('Fetched feedbacks:', res.data.feedbacks);
       } catch (err) {
-        console.error('Error fetching feedbacks:', err);
         showSnackbar('Failed to fetch feedbacks', 'error');
       }
     };
@@ -60,7 +58,6 @@ const Feedbacks = () => {
       setIsEditing((prev) => ({ ...prev, [id]: false }));
       showSnackbar('Reply sent!');
     } catch (err) {
-      console.error('Failed to send reply:', err);
       showSnackbar('Failed to send reply.', 'error');
     }
   };
@@ -78,65 +75,93 @@ const Feedbacks = () => {
   return (
     <>
       <ShopkeeperHeader />
-      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ mt: 12, px: 4, flex: 1, mb: 8 }}>
-          <Typography variant="h4" gutterBottom>
-            Manage Feedbacks
-          </Typography>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          backgroundColor: '#f9f9f9',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Container sx={{ mt: 15, mb: 10, flexGrow: 1 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Typography variant="h4" fontWeight={600} color="green" gutterBottom>
+              💬 Manage Feedbacks
+            </Typography>
 
-          {feedbacks.length > 0 ? (
-            feedbacks.map((fb) => (
-              <Paper key={fb._id} sx={{ p: 2, my: 2 }}>
-                <Typography><strong>Email:</strong> {fb.email}</Typography>
-                <Typography><strong>Message:</strong> {fb.message}</Typography>
+            {feedbacks.length > 0 ? (
+              feedbacks.map((fb) => (
+                <motion.div
+                  key={fb._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Paper
+                    elevation={6}
+                    sx={{
+                      p: 3,
+                      my: 3,
+                      borderRadius: 3,
+                      backgroundColor: '#fff',
+                    }}
+                  >
+                    <Typography fontWeight="bold">📧 Email: {fb.email}</Typography>
+                    <Typography sx={{ mt: 1 }}>📝 Message: {fb.message}</Typography>
 
-                {fb.reply && !isEditing[fb._id] ? (
-                  <>
-                    <Typography>
-                      <strong>Reply:</strong> {fb.reply}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      sx={{ mt: 1 }}
-                      onClick={() => toggleEdit(fb._id, fb.reply)}
-                    >
-                      Edit Reply
-                    </Button>
-                  </>
-                ) : !fb.reply || isEditing[fb._id] ? (
-                  <>
-                    <TextField
-                      fullWidth
-                      label="Write your reply"
-                      value={replyMap[fb._id] || ''}
-                      onChange={(e) =>
-                        handleReplyChange(fb._id, e.target.value)
-                      }
-                      sx={{ my: 2 }}
-                    />
-                    <Button
-                      variant="contained"
-                      onClick={() => handleReplySubmit(fb._id)}
-                    >
-                      {fb.reply ? 'Update Reply' : 'Send Reply'}
-                    </Button>
-                    {fb.reply && (
-                      <Button
-                        variant="text"
-                        sx={{ ml: 2 }}
-                        onClick={() => toggleEdit(fb._id)}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </>
-                ) : null}
-              </Paper>
-            ))
-          ) : (
-            <Typography>No feedbacks yet</Typography>
-          )}
-        </Box>
+                    {fb.reply && !isEditing[fb._id] ? (
+                      <>
+                        <Typography sx={{ mt: 2 }}>
+                          🟢 <strong>Reply:</strong> {fb.reply}
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          sx={{ mt: 1 }}
+                          onClick={() => toggleEdit(fb._id, fb.reply)}
+                        >
+                          Edit Reply
+                        </Button>
+                      </>
+                    ) : !fb.reply || isEditing[fb._id] ? (
+                      <>
+                        <TextField
+                          fullWidth
+                          label="Write your reply"
+                          value={replyMap[fb._id] || ''}
+                          onChange={(e) => handleReplyChange(fb._id, e.target.value)}
+                          sx={{ my: 2 }}
+                        />
+                        <Box>
+                          <Button
+                            variant="contained"
+                            onClick={() => handleReplySubmit(fb._id)}
+                          >
+                            {fb.reply ? 'Update Reply' : 'Send Reply'}
+                          </Button>
+                          {fb.reply && (
+                            <Button
+                              variant="text"
+                              sx={{ ml: 2 }}
+                              onClick={() => toggleEdit(fb._id)}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </Box>
+                      </>
+                    ) : null}
+                  </Paper>
+                </motion.div>
+              ))
+            ) : (
+              <Typography>No feedbacks yet</Typography>
+            )}
+          </motion.div>
+        </Container>
         <Footer />
       </Box>
 

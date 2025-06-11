@@ -2,103 +2,179 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import {
   Grid, Card, CardContent, Typography, Box,
-  Avatar, Button, CircularProgress
+  Avatar, Button, CircularProgress, TextField
 } from '@mui/material';
 import axios from '../axiosInstance';
 
-const CustomerAccessControl = () => {
-  const [customers, setCustomers] = useState([]);
+const ShopkeeperAccessControl = () => {
+  const [shopkeepers, setShopkeepers] = useState([]);
   const [loginStatuses, setLoginStatuses] = useState({});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchShopkeepers = async () => {
       setLoading(true);
       try {
-        // Change the API endpoint here if needed
-        const res = await axios.get('/api/customers/active-or-deactivated');
-        setCustomers(res.data);
-
-        // Map email to status for quick lookup
-        const statusMap = res.data.reduce((acc, cust) => {
-          acc[cust.email] = cust.status ?? 0;
+        const res = await axios.get('/api/shopkeepers/active-or-deactivated');
+        setShopkeepers(res.data);
+        const statusMap = res.data.reduce((acc, sk) => {
+          acc[sk.email] = sk.status ?? 0;
           return acc;
         }, {});
-
         setLoginStatuses(statusMap);
       } catch (err) {
-        setError('Error fetching customers');
+        setError('Error fetching shopkeepers');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCustomers();
+    fetchShopkeepers();
   }, []);
 
   const handleActivate = async (email) => {
     try {
-      await axios.put(`/api/customers/activate/${email}`);
+      await axios.put(`/api/shopkeepers/activate/${email}`);
       setLoginStatuses(prev => ({ ...prev, [email]: 1 }));
     } catch {
-      setError('Error activating customer');
+      setError('Error activating shopkeeper');
     }
   };
 
   const handleDeactivate = async (email) => {
     try {
-      await axios.put(`/api/customers/deactivate/${email}`);
+      await axios.put(`/api/shopkeepers/deactivate/${email}`);
       setLoginStatuses(prev => ({ ...prev, [email]: 3 }));
     } catch {
-      setError('Error deactivating customer');
+      setError('Error deactivating shopkeeper');
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) return <CircularProgress sx={{ m: 4 }} />;
 
   return (
     <div style={{
-      display: 'flex', minHeight: '100vh',
-      background: 'linear-gradient(to right, #e0e0e0, #f5f5f5)',
-      marginTop: '-8px', marginRight: '-8px'
+      display: 'flex',
+      minHeight: '100vh',
+      background: 'linear-gradient(to right, #f0f4f8, #ffffff)',
+      marginTop: '-8px',
+      marginRight: '-8px'
     }}>
       <Sidebar />
       <main style={{ flexGrow: 1, padding: 30 }}>
-        <Typography variant="h3" sx={{ mb: 4, fontWeight: 'bold', color: '#333' }}>
-          Customer Access Control Dashboard
+        <Typography
+          variant="h3"
+          sx={{
+            mb: 4,
+            fontWeight: 'bold',
+            color: '#1565c0',
+            textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+          }}
+        >
+          🔐 Customer Access Control
         </Typography>
 
-        {error && <Typography color="error">{error}</Typography>}
+        {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
 
         <Grid container spacing={4}>
-          {customers.map((cust) => {
-            const status = loginStatuses[cust.email];
-            if (status !== 1 && status !== 3) return null; // Show only status 1 or 3
+          {shopkeepers.map((sk) => {
+            const status = loginStatuses[sk.email];
+            if (status !== 1 && status !== 3) return null;
 
             const statusLabel =
-              status === 1 ? 'Approved' :
+              status === 1 ? 'Active' :
               status === 3 ? 'Deactivated' : 'Pending';
+
             const statusColor =
-              status === 1 ? 'green' :
-              status === 3 ? 'gray' : 'gray';
+              status === 1 ? '#2e7d32' :
+              status === 3 ? '#c62828' : '#9e9e9e';
+
+            const statusBg =
+              status === 1 ? '#e8f5e9' :
+              status === 3 ? '#ffebee' : '#f5f5f5';
 
             return (
-              <Grid item xs={12} md={4} key={cust._id}>
-                <Card sx={{ borderRadius: 3, boxShadow: 6 }}>
+              <Grid item xs={12} md={4} key={sk._id}>
+                <Card
+                  sx={{
+                    borderRadius: 4,
+                    boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-5px)',
+                      boxShadow: '0px 6px 24px rgba(0,0,0,0.15)'
+                    },
+                    height: 600,
+                    width: 300,
+                  }}
+                >
                   <CardContent>
-                    <Box display="flex" flexDirection="column" alignItems="center">
-                      <Avatar
-                        alt={cust.name}
-                        src={cust.profilePic || '/customer-icon.png'}
-                        sx={{ width: 80, height: 80, mb: 2 }}
-                      />
-                      <Typography variant="h6" gutterBottom>{cust.name}</Typography>
-                      <Typography sx={{ mb: 1 }}>Email: {cust.email}</Typography>
-                      <Typography sx={{ mb: 1 }}>Phone: {cust.phno}</Typography>
-                      <Typography sx={{ mb: 1 }}>Address: {cust.address}</Typography>
+                    <Box display="flex" flexDirection="column" >
+                      <Box display="flex" flexDirection="column" alignItems="center">
+    <Avatar
+      alt={sk.name}
+      src="/shopkeeper-icon.png"
+      sx={{ width: 80, height: 80, mb: 2 }}
+    >
+      {sk.name?.charAt(0).toUpperCase()}
+    </Avatar>
+    <Typography variant="h6" gutterBottom>{sk.name}</Typography>
+  </Box>
 
-                      <Typography sx={{ mb: 2, color: statusColor }}>
+                      <Typography sx={{ mb: 0.5, color: '#555' }}>
+                        <strong>Shop:</strong> {sk.shopname}
+                      </Typography>
+                      <Typography sx={{ mb: 0.5, color: '#555' }}>
+                        <strong>Email:</strong> {sk.email}
+                      </Typography>
+                      <Typography sx={{ mb: 0.5, color: '#555' }}>
+                        <strong>Phone:</strong> {sk.phno}
+                      </Typography>
+
+                      <TextField
+                        label="Address"
+                        value={sk.address}
+                        multiline
+                        fullWidth
+                        variant="outlined"
+                        InputProps={{ readOnly: true }}
+                        sx={{
+                          mb: 2,
+                          mt: 1,
+                          '& .MuiInputBase-root': {
+                            backgroundColor: '#f9f9f9',
+                          }
+                        }}
+                      />
+
+                      <Typography sx={{ mb: 1, color: '#555' }}>
+                        <strong>License No:</strong> {sk.licenseno}
+                      </Typography>
+
+                      <Button
+                        variant="outlined"
+                        href={`http://localhost:5000/uploads/shopkeepers/${sk.licenseImage}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ mb: 2 }}
+                      >
+                        View License
+                      </Button>
+
+                      <Typography
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          color: statusColor,
+                          backgroundColor: statusBg,
+                          px: 2,
+                          py: 0.5,
+                          borderRadius: 2,
+                          fontSize: '0.9rem',
+                          display: 'inline-block'
+                        }}
+                      >
                         Status: {statusLabel}
                       </Typography>
 
@@ -106,17 +182,29 @@ const CustomerAccessControl = () => {
                         <Button
                           variant="contained"
                           color="success"
-                          onClick={() => handleActivate(cust.email)}
+                          onClick={() => handleActivate(sk.email)}
                           disabled={status === 1}
-                          sx={{ mr: 1 }}
+                          sx={{
+                            mr: 1,
+                            boxShadow: '0px 2px 6px rgba(0,0,0,0.2)',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 'bold'
+                          }}
                         >
                           Activate
                         </Button>
                         <Button
                           variant="contained"
                           color="error"
-                          onClick={() => handleDeactivate(cust.email)}
+                          onClick={() => handleDeactivate(sk.email)}
                           disabled={status === 3}
+                          sx={{
+                            boxShadow: '0px 2px 6px rgba(0,0,0,0.2)',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 'bold'
+                          }}
                         >
                           Deactivate
                         </Button>
@@ -133,4 +221,4 @@ const CustomerAccessControl = () => {
   );
 };
 
-export default CustomerAccessControl;
+export default ShopkeeperAccessControl;

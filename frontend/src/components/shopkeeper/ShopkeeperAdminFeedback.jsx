@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, Typography, TextField, Button, Paper, Snackbar, Alert 
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Snackbar,
+  Alert,
+  Container,
 } from '@mui/material';
 import axiosInstance from '../axiosInstance';
 import { jwtDecode } from 'jwt-decode';
 import ShopkeeperHeader from './ShopkeeperHeader';
 import Footer from './ShopkeeperFooter';
+import { motion } from 'framer-motion';
 
 const ShopkeeperSendAndViewFeedback = () => {
   const [message, setMessage] = useState('');
   const [feedbacks, setFeedbacks] = useState([]);
 
-  // Snackbar states
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const token = localStorage.getItem('token');
@@ -72,56 +79,79 @@ const ShopkeeperSendAndViewFeedback = () => {
   }, []);
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh" >
+    <Box display="flex" flexDirection="column" minHeight="100vh">
       <ShopkeeperHeader />
 
-      <Box component="main" flex="1" sx={{ mt: 12, px: 4, width: '50%', mx: 'auto', mb: 4 }}>
-        <Typography variant="h4" gutterBottom>Send Feedback</Typography>
+      <Container sx={{ mt: 15, mb: 10, flexGrow: 1 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Typography variant="h4" fontWeight={600} color="green" gutterBottom>
+            📝 Send Feedback
+          </Typography>
 
-        <Paper sx={{ p: 3, mb: 4 }}>
-          <TextField
-            fullWidth
-            multiline
-            minRows={4}
-            label="Your Feedback"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Button variant="contained" onClick={handleSubmit}>Submit</Button>
-        </Paper>
+          <Paper elevation={6} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+            <TextField
+              fullWidth
+              multiline
+              minRows={4}
+              label="Your Feedback"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <Button variant="contained" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Paper>
 
-        {feedbacks.length > 0 ? (
-          feedbacks.map((fb, index) => (
-            <Paper key={index} sx={{ p: 2, mb: 2 }}>
-              <Typography><strong>Message:</strong> {fb.message}</Typography>
-              <Typography sx={{ mt: 1 }}>
-                <strong>Reply:</strong>{' '}
-                {fb.reply && fb.reply.trim() !== ''
-                  ? fb.reply
-                  : <em>Waiting for admin reply</em>}
-              </Typography>
-              <Typography sx={{ fontSize: '0.8rem', mt: 1, color: 'gray' }}>
-                Submitted on: {new Date(fb.created).toLocaleString()}
-              </Typography>
-            </Paper>
-          ))
-        ) : (
-          <Typography>No feedbacks submitted yet.</Typography>
-        )}
-      </Box>
+          <Typography variant="h5" fontWeight={500} gutterBottom>
+            📬 Your Previous Feedbacks
+          </Typography>
+
+          {feedbacks.length > 0 ? (
+            feedbacks.map((fb, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Paper elevation={4} sx={{ p: 3, mb: 2, borderRadius: 3 }}>
+                  <Typography>
+                    <strong>Message:</strong> {fb.message}
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    <strong>Reply:</strong>{' '}
+                    {fb.reply && fb.reply.trim() !== ''
+                      ? fb.reply
+                      : <em>Waiting for admin reply</em>}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.8rem', mt: 1, color: 'gray' }}>
+                    Submitted on: {new Date(fb.created).toLocaleString()}
+                  </Typography>
+                </Paper>
+              </motion.div>
+            ))
+          ) : (
+            <Typography>No feedbacks submitted yet.</Typography>
+          )}
+        </motion.div>
+      </Container>
 
       <Footer />
 
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={4000} 
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbarSeverity} 
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
           sx={{ width: '100%' }}
         >
           {snackbarMessage}

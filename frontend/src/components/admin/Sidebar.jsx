@@ -53,7 +53,7 @@ const isFeedbackActive = () => location.pathname.startsWith('/feedback');
         flexDirection: 'column',
         '& .MuiDrawer-paper': {
           width: 250,
-          background: 'linear-gradient(to bottom right, rgb(42, 77, 43), rgb(100, 156, 103))',
+          background: 'linear-gradient(to bottom right, rgb(72, 134, 74), rgb(100, 156, 103))',
           color: 'white',
           paddingTop: '10px',
           borderRight: '2px solid rgba(0,0,0,0.1)',
