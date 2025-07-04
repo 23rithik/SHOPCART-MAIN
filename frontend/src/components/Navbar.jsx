@@ -30,17 +30,24 @@ const Navbar = () => {
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Logo - Shopcart Name with Text Styling */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            sx={{
-              color: '#333',
-              fontSize: '1.5rem',
-            }}
-          >
-            SHOPCART
-          </Typography>
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              sx={{
+                color: '#333',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                '&:hover': {
+                  color: '#2e7d32',
+                },
+              }}
+            >
+              SHOPCART
+            </Typography>
+          </Link>
         </Box>
+
 
         {/* Navigation Links */}
         <Box>
