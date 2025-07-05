@@ -33,9 +33,9 @@ const orderRoutes = require('./routes/order'); // import order routes
 const ordersStatusRoutes = require('./routes/orderStatus'); // import order status routes
 const customeradminfeedback=require('./routes/CustomerAdminFeedback'); // import customer admin feedback routes
 const shopkeeperOrderRoutes = require('./routes/shopkeeperOrders');
+const aiChatRoutes = require('./routes/aiChat'); // import AI chat routes
 
 // const shopkeeperActivity = require('./routes/shopkeeperActivity'); // import shopkeeper activity routes
-
 
 // Middleware
 app.use(express.json()); // Global JSON parsing middleware
@@ -69,6 +69,7 @@ app.use('/api/orderstatus/status', ordersStatusRoutes); // Use the order status 
 app.use('/api/feedbacks', customeradminfeedback); // Use the customer admin feedback routes
 app.use('/api/customer-shopkeeper-feedback', require('./routes/customerToShopkeeperFeedback'));
 app.use('/api/shopkeeper/orders', shopkeeperOrderRoutes);
+app.use('/api', aiChatRoutes); // Use the AI chat routes
 // app.use('/api', shopkeeperActivity);
 
 

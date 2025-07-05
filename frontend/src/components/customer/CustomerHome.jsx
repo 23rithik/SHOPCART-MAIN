@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -15,6 +15,7 @@ import {
   IconButton,
   Stack,
   Paper,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -56,6 +57,16 @@ const CustomerHome = () => {
   const [newMessage, setNewMessage] = useState('');
   const navigate = useNavigate();
   const [customerName, setCustomerName] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef(null);
+
+
+  useEffect(() => {
+  if (chatEndRef.current) {
+    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }
+}, [chatMessages]);
+
 
   const capitalizeFirstLetter = (string) => {
     if (!string) return '';
@@ -126,20 +137,69 @@ const CustomerHome = () => {
   };
 
   // Chat message send handler (mocked - replace with your API logic)
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
-    const userMessage = { sender: 'user', text: newMessage.trim() };
-    setChatMessages((prev) => [...prev, userMessage]);
+
+    const messageText = newMessage.trim();
     setNewMessage('');
 
-    // Simulate AI assistant reply after 1s
+    // Add user message with "sending" state
+    const userMessage = {
+      sender: 'user',
+      text: messageText,
+      sending: true,
+    };
+    const tempUserIndex = chatMessages.length;
+
+    setChatMessages((prev) => [...prev, userMessage]);
+
+    // Simulate network delay by removing "sending" after a short timeout
     setTimeout(() => {
-      const botReply = {
-        sender: 'bot',
-        text: "Hi! How can I assist you with your shopping today?",
-      };
-      setChatMessages((prev) => [...prev, botReply]);
-    }, 1000);
+      setChatMessages((prev) => {
+        const updated = [...prev];
+        updated[tempUserIndex] = { ...updated[tempUserIndex], sending: false };
+        return updated;
+      });
+    }, 300); // Optional: can remove this to instantly show as sent
+
+    // Add a temporary "Typing..." message for bot
+    const tempBotIndex = tempUserIndex + 1;
+    setIsTyping(true);
+    setChatMessages((prev) => [...prev, { sender: 'bot', text: 'Typing...', temp: true }]);
+
+    try {
+      const response = await axiosInstance.post('/api/ai-chat', {
+        prompt: messageText,
+      });
+
+      const aiText = response.data.text || 'No response';
+
+      // Simulate bot typing effect
+      let typedText = '';
+      for (let i = 0; i < aiText.length; i++) {
+        typedText += aiText[i];
+
+        setChatMessages((prev) => {
+          const updated = [...prev];
+          updated[tempBotIndex] = { sender: 'bot', text: typedText };
+          return updated;
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 15)); // Typing speed
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setChatMessages((prev) => {
+        const updated = [...prev];
+        updated[tempBotIndex] = {
+          sender: 'bot',
+          text: 'Sorry, something went wrong.',
+        };
+        return updated;
+      });
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   // Filter products by search term
@@ -368,6 +428,7 @@ const CustomerHome = () => {
             zIndex: 1400,
           }}
         >
+          {/* Header */}
           <Box
             sx={{
               px: 2,
@@ -392,6 +453,7 @@ const CustomerHome = () => {
             </IconButton>
           </Box>
 
+          {/* Chat messages */}
           <Box
             sx={{
               flexGrow: 1,
@@ -405,10 +467,15 @@ const CustomerHome = () => {
             }}
           >
             {chatMessages.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 2, textAlign: 'center' }}
+              >
                 Start the conversation...
               </Typography>
             )}
+
             {chatMessages.map((msg, idx) => (
               <Box
                 key={idx}
@@ -421,13 +488,22 @@ const CustomerHome = () => {
                   borderRadius: 2,
                   maxWidth: '80%',
                   wordBreak: 'break-word',
+                  position: 'relative',
                 }}
               >
                 {msg.text}
+                {msg.sending && (
+                  <CircularProgress
+                    size={12}
+                    sx={{ position: 'absolute', bottom: 4, right: 4, color: 'white' }}
+                  />
+                )}
               </Box>
             ))}
+             <Box ref={chatEndRef} />
           </Box>
 
+          {/* Input box */}
           <Box sx={{ p: 1, display: 'flex', gap: 1 }}>
             <TextField
               variant="outlined"
@@ -442,10 +518,18 @@ const CustomerHome = () => {
                   handleSendMessage();
                 }
               }}
+              disabled={isTyping}
             />
-            <Button variant="contained" color="success" onClick={handleSendMessage}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleSendMessage}
+              disabled={isTyping}
+            >
               Send
             </Button>
+           
+
           </Box>
         </Paper>
       )}
