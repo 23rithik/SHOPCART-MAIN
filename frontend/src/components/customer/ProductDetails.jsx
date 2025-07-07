@@ -16,6 +16,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosInstance';
 import CustomerHeader from './CustomerHeader';
 import CustomerFooter from './CustomerFooter';
+import ReviewSection from './ReviewSection';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -169,6 +170,7 @@ const ProductDetails = () => {
                 )}
               </CardContent>
             </Card>
+            <ReviewSection productId={product._id} />
           </Box>
         </Fade>
       </Container>

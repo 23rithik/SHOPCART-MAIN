@@ -34,6 +34,7 @@ const ordersStatusRoutes = require('./routes/orderStatus'); // import order stat
 const customeradminfeedback=require('./routes/CustomerAdminFeedback'); // import customer admin feedback routes
 const shopkeeperOrderRoutes = require('./routes/shopkeeperOrders');
 const aiChatRoutes = require('./routes/aiChat'); // import AI chat routes
+const reviewRoutes = require('./routes/review');
 
 // const shopkeeperActivity = require('./routes/shopkeeperActivity'); // import shopkeeper activity routes
 
@@ -70,6 +71,7 @@ app.use('/api/feedbacks', customeradminfeedback); // Use the customer admin feed
 app.use('/api/customer-shopkeeper-feedback', require('./routes/customerToShopkeeperFeedback'));
 app.use('/api/shopkeeper/orders', shopkeeperOrderRoutes);
 app.use('/api', aiChatRoutes); // Use the AI chat routes
+app.use('/api/reviews', reviewRoutes);
 // app.use('/api', shopkeeperActivity);
 
 
