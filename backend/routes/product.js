@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const verifyToken = require('../middleware/auth');
 const Activity = require('../models/Activity');
 const Shopkeeper = require('../models/Shopkeeper');
+const axios = require('axios');
 
 
 const router = express.Router();
@@ -145,6 +146,20 @@ router.put('/update/:id', verifyToken, upload.single('image'), async (req, res) 
   } catch (err) {
     console.error('Update error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+router.get('/triggersentiment', async (req, res) => {
+  try {
+    
+    const response = await axios.get('http://localhost:5001/api/sentiment/update_scores');
+    console.log('Sentiment scoring triggered:', response.data);
+    
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to trigger sentiment scoring' });
+    console.error('Error triggering sentiment scoring:', err);
   }
 });
 

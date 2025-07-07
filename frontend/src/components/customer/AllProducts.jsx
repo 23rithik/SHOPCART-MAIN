@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosInstance';
 import CustomerHeader from './CustomerHeader';
 import CustomerFooter from './CustomerFooter';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -125,9 +126,32 @@ const AllProducts = () => {
       <CustomerHeader />
       <Box sx={{ flexGrow: 1 }}>
         <Container sx={{ pt: 13, pb: 6 }}>
-          <Typography variant="h4" fontWeight={600} mb={3} color="green">
-            Products
-          </Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" fontWeight={600} color="green">
+          Products
+        </Typography>
+
+        <Button
+          variant="contained"
+          color="success"
+          endIcon={<BarChartIcon />}
+          onClick={() => navigate('/scores')}
+          sx={{
+            px: 3,
+            py: 1,
+            borderRadius: 2,
+            fontWeight: 600,
+            textTransform: 'none',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            },
+          }}
+        >
+          Product Scores
+        </Button>
+      </Box>
 
           {/* Search Input */}
           <TextField

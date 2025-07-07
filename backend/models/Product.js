@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
   description: { type: String, required: true },
   category: { type: String, required: true }, // ✅ Added category
   image: { type: String, required: true },
+  score: { type: Number, default: 0 },
   shopkeeper_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Login', required: true }
 });
 

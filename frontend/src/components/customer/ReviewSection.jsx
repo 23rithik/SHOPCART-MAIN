@@ -62,23 +62,28 @@ const ReviewSection = ({ productId }) => {
   }, [productId]);
 
   const handleReviewSubmit = async () => {
-    if (!reviewText.trim()) return showSnackbar('Please enter your review text.');
-    if (rating === 0) return showSnackbar('Please provide a rating.');
+  if (!reviewText.trim()) return showSnackbar('Please enter your review text.');
+  if (rating === 0) return showSnackbar('Please provide a rating.');
 
-    try {
-      await axiosInstance.post(
-        '/api/reviews/add',
-        { productId, reviewText, rating },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setReviewText('');
-      setRating(0);
-      fetchReviews();
-    } catch (err) {
-      console.error(err);
-      showSnackbar('Login required or error adding review');
-    }
-  };
+  try {
+    await axiosInstance.post(
+      '/api/reviews/add',
+      { productId, reviewText, rating },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // 🔁 Trigger sentiment scoring
+    await axiosInstance.get('/api/products/triggersentiment');
+
+    setReviewText('');
+    setRating(0);
+    fetchReviews();
+  } catch (err) {
+    console.error(err);
+    showSnackbar('Login required or error adding review');
+  }
+};
+
 
   const handleCommentSubmit = async (reviewId) => {
     const commentText = commentInputs[reviewId]?.trim();

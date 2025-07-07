@@ -30,6 +30,7 @@ import CartPage from './components/customer/CartPage';
 import CustomerOrders from './components/customer/CustomerOrders';
 import CustomerAdminFeedback from './components/customer/CustomerAdminFeedback';
 import CustomerShopkeeperFeedback from './components/customer/CustomerShopkeeperFeedback';
+import Scores from './components/customer/Scores';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
         <Route path="/orders" element={<PrivateRoute><CustomerOrders /></PrivateRoute>} />
         <Route path="/customeradminfeedback" element={<PrivateRoute><CustomerAdminFeedback /></PrivateRoute>} />
         <Route path="/customershopkeeperfeedback" element={<PrivateRoute><CustomerShopkeeperFeedback /></PrivateRoute>} />
+        <Route path="/scores" element={<PrivateRoute><Scores /></PrivateRoute>} />
         
         {/* Shopkeeper routes */}
         
