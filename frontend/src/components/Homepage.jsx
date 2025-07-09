@@ -15,8 +15,9 @@ const Homepage = () => {
       title: 'Fresh Organic Chips',
     },
     {
-      image: 'https://www.yummyntasty.com/wp-content/uploads/2016/06/how-to-make-dates-garlic-pickle-1024x683.jpg',
+      image: 'https://assets.epicurious.com/photos/64187061a10e29125aa2bded/3:2/w_6417,h_4278,c_limit/ZucchiniPickles_RECIPE_031623_49175.jpg',
       title: 'Traditional Pickles & Spices',
+      // https://www.yummyntasty.com/wp-content/uploads/2016/06/how-to-make-dates-garlic-pickle-1024x683.jpg
     },
   ];
 
