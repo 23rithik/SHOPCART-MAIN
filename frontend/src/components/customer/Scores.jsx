@@ -7,9 +7,11 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import CustomerHeader from './CustomerHeader';
 import CustomerFooter from './CustomerFooter';
+import { useNavigate } from 'react-router-dom';
 
 const Scores = () => {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('score'); // score or price
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -49,6 +51,9 @@ const Scores = () => {
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
+  };
+  const handleBuyNow = (product) => {
+    navigate(`/productdetails/${product._id}`);
   };
 
   return (
@@ -143,37 +148,46 @@ const Scores = () => {
         <Grid container spacing={3} justifyContent="center">
           {paginatedProducts.map((p) => (
             <Grid item xs={12} sm={6} md={4} key={p._id}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 3,
-                  boxShadow: 3,
-                  transition: 'transform 0.3s',
-                  '&:hover': { transform: 'scale(1.03)' }
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={`http://localhost:5000/uploads/product_image/${p.image}`}
-                  alt={p.name}
-                />
-                <CardContent>
-                  <Typography variant="h6">{p.name}</Typography>
-                  <Typography color="text.secondary">₹{p.price}</Typography>
+              <Box
+  onClick={() => handleBuyNow(p)}
+  sx={{
+    cursor: 'pointer',
+    height: '100%',
+  }}
+>
+  <Card
+    sx={{
+      height: '100%',
+      borderRadius: 3,
+      boxShadow: 3,
+      transition: 'transform 0.3s',
+      '&:hover': { transform: 'scale(1.03)' }
+    }}
+  >
+    <CardMedia
+      component="img"
+      height="180"
+      image={`http://localhost:5000/uploads/product_image/${p.image}`}
+      alt={p.name}
+    />
+    <CardContent>
+      <Typography variant="h6">{p.name}</Typography>
+      <Typography color="text.secondary">₹{p.price}</Typography>
 
-                  <Box display="flex" alignItems="center" mt={1}>
-                    <Rating value={p.score / 20} precision={0.1} readOnly />
-                    <Typography ml={1}>({p.score}/100)</Typography>
-                  </Box>
+      <Box display="flex" alignItems="center" mt={1}>
+        <Rating value={p.score / 20} precision={0.1} readOnly />
+        <Typography ml={1}>({p.score}/100)</Typography>
+      </Box>
 
-                  <Box mt={1}>{getSentimentChip(p.score)}</Box>
+      <Box mt={1}>{getSentimentChip(p.score)}</Box>
 
-                  <Typography variant="body2" color="text.secondary" mt={1}>
-                    {p.description?.slice(0, 60)}...
-                  </Typography>
-                </CardContent>
-              </Card>
+      <Typography variant="body2" color="text.secondary" mt={1}>
+        {p.description?.slice(0, 60)}...
+      </Typography>
+    </CardContent>
+  </Card>
+</Box>
+
             </Grid>
           ))}
         </Grid>

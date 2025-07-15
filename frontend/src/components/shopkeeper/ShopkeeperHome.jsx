@@ -267,6 +267,7 @@ const ShopkeeperHome = () => {
                     >
                       <Card
                         sx={{
+                           width: 170,
                           borderRadius: 4,
                           boxShadow: 3,
                           backgroundColor: '#ffffff',

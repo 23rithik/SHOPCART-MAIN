@@ -84,6 +84,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                autoComplete="new-password"
                 sx={{ marginBottom: 2 }}
                 InputProps={{
                   endAdornment: (
