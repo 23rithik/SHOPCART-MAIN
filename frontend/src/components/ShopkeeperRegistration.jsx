@@ -4,6 +4,7 @@ import Footer from './Footer';
 import { Box, Container, Typography, TextField, Button, Grid, Paper } from '@mui/material'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const ShopkeeperRegistration = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,43 @@ const ShopkeeperRegistration = () => {
     password: '',
     confirmPassword: '',
   });
+  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate(); // For navigation after successful registration
+
+
+useEffect(() => {
+  const nameRegex = /^[A-Za-z\s]+$/;
+  const shopnameRegex = /^[A-Za-z0-9\s]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9]{10}$/;
+  const licenseRegex = /^[A-Za-z0-9]+$/;
+  const passwordRegex = /^.{6,}$/;
+
+  const {
+    name,
+    shopname,
+    email,
+    phno,
+    address,
+    licenseno,
+    licenseImage,
+    password,
+    confirmPassword,
+  } = formData;
+
+  const isValid =
+    nameRegex.test(name) &&
+    shopnameRegex.test(shopname) &&
+    emailRegex.test(email) &&
+    phoneRegex.test(phno) &&
+    address.trim().length > 0 &&
+    licenseRegex.test(licenseno) &&
+    licenseImage &&
+    passwordRegex.test(password) &&
+    password === confirmPassword;
+
+  setIsFormValid(isValid);
+}, [formData]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -187,10 +224,42 @@ const ShopkeeperRegistration = () => {
                   >
                     Register
                   </Button>
+                  
                 </Grid>
               </Grid>
             </form>
           </Paper>
+          <Typography
+  variant="body2"
+  align="center"
+  sx={{
+    mt: 4,
+    fontSize: '1rem',
+    fontWeight: 500,
+    color: '#333',
+    
+    fontFamily: 'Segoe UI, sans-serif',
+  }}
+>
+  Already registered?{' '}
+  <Button
+    variant="text"
+    onClick={() => navigate('/login')}
+    sx={{
+      textTransform: 'none',
+      color: '#1976d2',
+      fontWeight: 'bold',
+      fontSize: '1rem',
+      padding: 0,
+      minWidth: 'unset',
+      textDecoration: 'underline',
+     
+    }}
+  >
+    Login
+  </Button>
+</Typography>
+
         </Container>
       </Box>
 

@@ -4,6 +4,7 @@ import Footer from './Footer';
 import { Box, Container, Typography, TextField, Button, Grid, Paper } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const CustomerRegistration = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +16,31 @@ const CustomerRegistration = () => {
     password: '',
     confirmPassword: '',
   });
+  const [formValid, setFormValid] = useState(false);
+
 
   const navigate = useNavigate();
+
+  
+
+useEffect(() => {
+  const nameRegex = /^[A-Za-z\s]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9]{10}$/;
+  const passwordRegex = /^.{6,}$/;
+
+  const isValid =
+    nameRegex.test(formData.name) &&
+    emailRegex.test(formData.email) &&
+    phoneRegex.test(formData.phno) &&
+    formData.address.trim().length >= 5 &&
+    formData.profilePic &&
+    passwordRegex.test(formData.password) &&
+    formData.password === formData.confirmPassword;
+
+  setFormValid(isValid);
+}, [formData]);
+
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -183,6 +207,36 @@ const CustomerRegistration = () => {
             </form>
 
           </Paper>
+          <Typography
+            variant="body2"
+            align="center"
+            sx={{
+              mt: 4,
+              fontSize: '1rem',
+              fontWeight: 500,
+              color: '#333',
+              
+              fontFamily: 'Segoe UI, sans-serif',
+            }}
+          >
+            Already registered?{' '}
+            <Button
+              variant="text"
+              onClick={() => navigate('/login')}
+              sx={{
+                textTransform: 'none',
+                color: '#1976d2',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                padding: 0,
+                minWidth: 'unset',
+                textDecoration: 'underline',
+               
+              }}
+            >
+              Login
+            </Button>
+          </Typography>
         </Container>
       </Box>
 

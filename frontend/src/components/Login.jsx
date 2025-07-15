@@ -105,6 +105,56 @@ const Login = () => {
               </Button>
             </form>
           </Paper>
+          <Typography
+  variant="body2"
+  align="center"
+  sx={{
+    mt: 4,
+    fontSize: '1rem',
+    fontWeight: 500,
+    color: '#333',
+    textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+    fontFamily: 'Segoe UI, sans-serif',
+  }}
+>
+  Don’t have an account?
+</Typography>
+
+<Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+  <Button
+    variant="outlined"
+    onClick={() => navigate('/sreg')}
+    sx={{
+      textTransform: 'none',
+      borderColor: '#4CAF50',
+      color: '#4CAF50',
+      fontWeight: 'bold',
+      '&:hover': {
+        backgroundColor: '#e8f5e9',
+        borderColor: '#45a049',
+      },
+    }}
+  >
+    Register as Shopkeeper
+  </Button>
+  <Button
+    variant="outlined"
+    onClick={() => navigate('/creg')}
+    sx={{
+      textTransform: 'none',
+      borderColor: '#2196F3',
+      color: '#2196F3',
+      fontWeight: 'bold',
+      '&:hover': {
+        backgroundColor: '#e3f2fd',
+        borderColor: '#1976d2',
+      },
+    }}
+  >
+    Register as Customer
+  </Button>
+</Box>
+
         </Container>
       </Box>
 
